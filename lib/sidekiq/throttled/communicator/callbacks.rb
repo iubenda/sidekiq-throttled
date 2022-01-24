@@ -57,9 +57,11 @@ module Sidekiq
           @mutex.synchronize do
             fiber = Fiber.new do
               @handlers[event.to_s].each do |callback|
-                callback.call(payload)
-              rescue => e
-                handle_exception(e, :context => "sidekiq:throttled")
+                begin
+                  callback.call(payload)
+                rescue => e
+                  handle_exception(e, :context => "sidekiq:throttled")
+                end
               end
             end
 

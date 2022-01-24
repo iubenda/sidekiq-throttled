@@ -6,18 +6,20 @@ RSpec.describe Sidekiq::Throttled::Communicator do
   let(:callbacks) { described_class::Callbacks.new }
 
   around do |example|
-    old_callbacks = communicator.instance_variable_get(:@callbacks)
-    old_listener  = communicator.instance_variable_get(:@listener)
+    begin
+      old_callbacks = communicator.instance_variable_get(:@callbacks)
+      old_listener  = communicator.instance_variable_get(:@listener)
 
-    communicator.instance_variable_set(:@callbacks, callbacks)
-    communicator.instance_variable_set(:@listener,  nil)
+      communicator.instance_variable_set(:@callbacks, callbacks)
+      communicator.instance_variable_set(:@listener,  nil)
 
-    example.run
-  ensure
-    communicator.stop_listener
+      example.run
+    ensure
+      communicator.stop_listener
 
-    communicator.instance_variable_set(:@callbacks, old_callbacks)
-    communicator.instance_variable_set(:@listener,  old_listener)
+      communicator.instance_variable_set(:@callbacks, old_callbacks)
+      communicator.instance_variable_set(:@listener,  old_listener)
+    end
   end
 
   def run_callbacks(name, *args)
